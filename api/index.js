@@ -9,23 +9,25 @@ const app = express();
 // Connect to Database
 connectDB();
 
-// Middleware
+// Middleware - Allow all origins for production
 app.use(cors({
-  origin: process.env.FRONTEND_URL || "*",
-  credentials: true
+  origin: "*",
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: false
 }));
+
+// Handle preflight OPTIONS requests
+app.options("*", cors());
+
 app.use(express.json());
 
 // Routes
 app.use("/api/resumes", resumeRoutes);
 
 app.get("/", (req, res) => {
-  res.send("AI Resume Generator API is running.");
+  res.json({ message: "AI Resume Generator API is running." });
 });
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-
+// Vercel serverless: DO NOT call app.listen()
 module.exports = app;
